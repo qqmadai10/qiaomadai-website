@@ -20,8 +20,10 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --fund=false
 
-      - name: Build
-        run: npm run build
+      - name: Build with environment variables
+        run: |
+          echo "Building with VITE_ZHIPUAI_API_KEY..."
+          npm run build
         env:
           VITE_ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
 

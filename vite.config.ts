@@ -1,9 +1,12 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  // 在构建时通过环境变量获取API Key
-  const apiKey = process.env.ZHIPUAI_API_KEY;
+  // 加载所有环境变量
+  const env = loadEnv(mode, process.cwd(), '');
+
+  // 调试信息
+  console.log('API Key in build:', env.VITE_ZHIPUAI_API_KEY ? 'Set' : 'Not set');
 
   return {
     plugins: [react()],
@@ -11,8 +14,9 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
     },
+    // 正确传递环境变量到客户端
     define: {
-      'process.env.ZHIPUAI_API_KEY': JSON.stringify(apiKey),
+      'import.meta.env.VITE_ZHIPUAI_API_KEY': JSON.stringify(env.VITE_ZHIPUAI_API_KEY),
     },
   };
 });

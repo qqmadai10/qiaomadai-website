@@ -20,9 +20,15 @@ interface ChatHistoryItem {
 }
 
 export const sendMessageToAI = async (userMessage: string, history: ChatHistoryItem[]): Promise<string> => {
-  // 从环境变量获取 API Key
-  const apiKey = process.env.ZHIPUAI_API_KEY;
-  if (!apiKey) return "⚠️ 系统提示：API Key 未配置。";
+  // 1. 从环境变量获取 API Key
+  const apiKey = import.meta.env.VITE_ZHIPUAI_API_KEY;
+
+  console.log('API Key:', apiKey ? 'Set' : 'Not set'); // 调试信息
+
+  if (!apiKey) {
+    console.error("API Key 未配置，当前环境变量:", import.meta.env);
+    return "⚠️ 系统提示：API Key 未配置。请检查环境变量设置。";
+  }
 
   try {
     // 2. 构建消息列表，将系统指令作为第一条系统消息
@@ -53,19 +59,19 @@ export const sendMessageToAI = async (userMessage: string, history: ChatHistoryI
           "Authorization": `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: "glm-4", // 使用 GLM-4 模型
+          model: "glm-4",
           messages: messages,
-          max_tokens: 512, // 增加最大token数以获得更完整的回复
+          max_tokens: 512,
           temperature: 0.8,
-          stream: false // 非流式响应
+          stream: false
         })
       }
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("智谱AI API 错误:", errorData);
-      throw new Error(`API 请求失败: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error("智谱AI API 错误:", errorText);
+      throw new Error(`API 请求失败: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
