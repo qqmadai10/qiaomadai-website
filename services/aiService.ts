@@ -61,7 +61,7 @@ export const sendMessageToAI = async (userMessage: string, history: ChatHistoryI
         body: JSON.stringify({
           model: "glm-4",
           messages: messages,
-          max_tokens: 512,
+          max_tokens: 50,
           temperature: 0.8,
           stream: false
         })
