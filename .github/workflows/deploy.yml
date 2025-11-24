@@ -1,25 +1,31 @@
-name: Deploy Vite App
+name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
 
-      - run: npm install
-      - run: npm run build
-        env:
-          VITE_ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
+    - run: npm install
+    - run: npm run build
+      env:
+        VITE_ZHIPUAI_API_KEY: ${{ secrets.ZHIPUAI_API_KEY }}
 
-      - uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
+    - name: Deploy
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        npx gh-pages -d dist -u "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
